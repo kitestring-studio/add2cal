@@ -16,53 +16,49 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
-define('ADDEVENT_PLUGIN_DIR', plugin_dir_path(__FILE__));
+class Add_Event {
+	/**
+	 * Class constructor
+	 */
+	public function __construct() {
+		$this->includes();
+		$this->init_hooks();
+	}
 
-require_once ADDEVENT_PLUGIN_DIR . 'includes/class-addeventbase.php';
-require_once ADDEVENT_PLUGIN_DIR . 'includes/class-addeventbutton.php';
-require_once ADDEVENT_PLUGIN_DIR . 'includes/class-addeventlinks.php';
+	/**
+	 * Include necessary files
+	 */
+	public function includes() {
+		define('ADDEVENT_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-// Define the addevent_button shortcode
-//add_shortcode( 'addevent_button', array( 'AddEventButton', 'render_shortcode' ) );
+		require_once ADDEVENT_PLUGIN_DIR . 'includes/class-add-event-shortcodes.php';
+        require_once ADDEVENT_PLUGIN_DIR . 'includes/class-add-event-shortcode-helper.php';
+		require_once ADDEVENT_PLUGIN_DIR . 'includes/class-add-event-admin-notices.php';
+	}
 
-// Define the addevent_links shortcode
-//add_shortcode( 'addevent_links', array( 'AddEventLinks', 'render_shortcode' ) );
+	/**
+	 * Initialize hooks
+	 */
+	public function init_hooks() {
+		add_action('init', array($this, 'register_shortcodes'));
+		add_action('admin_notices', array(Add_Event_Admin_Notices::class, 'display_admin_notices'));
+	}
 
-// Enqueue the Addevent JavaScript file when required
-function enqueue_addevent_script() {
-	if ( ! wp_script_is( 'addevent', 'enqueued' ) ) {
-		wp_enqueue_script( 'addevent', 'https://cdn.addevent.com/libs/atc/1.6.1/atc.min.js', array(), null, true );
+	/**
+	 * Register shortcodes
+	 */
+	public function register_shortcodes() {
+		$shortcodes = new Add_Event_Shortcodes();
+		add_shortcode('addevent_button', array($shortcodes, 'addevent_button_shortcode'));
+		add_shortcode('addevent_links', array($shortcodes, 'addevent_links_shortcode'));
+	}
+
+	/**
+	 * Enqueue scripts
+	 */
+	public static function enqueue_scripts() {
+		wp_enqueue_script('addevent', 'https://cdn.addevent.com/libs/atc/1.6.1/atc.min.js', array(), null, true);
 	}
 }
 
-add_action( 'wp_enqueue_scripts', '\AddEvent\enqueue_addevent_script' );
-
-// Show admin notice if the API key is not defined
-function addevent_admin_notice() {
-	if ( ! defined( 'ADDEVENT_API_KEY' ) && current_user_can( 'activate_plugins' ) ) {
-		?>
-        <div class="notice notice-warning">
-            <p><?php _e( 'The AddEvent plugin needs the client ID (API key) defined in wp-config.php.', 'addevent-shortcodes' ); ?></p>
-        </div>
-		<?php
-	}
-}
-
-add_action( 'admin_notices', 'addevent_admin_notice' );
-
-register_activation_hook( __FILE__, function () {
-	if ( ! defined( 'ADDEVENT_API_KEY' ) ) {
-		deactivate_plugins( plugin_basename( __FILE__ ) );
-		wp_die( __( 'AddEvent requires the client ID to be defined in wp-config.php', 'addevent' ) );
-	}
-} );
-
-register_deactivation_hook( __FILE__, function () {
-	// Clean up, e.g. delete plugin options...
-} );
-
-function register_addevent_shortcodes() {
-	add_shortcode('addevent_button', array('\AddEvent\AddEventButton', 'render_shortcode'));
-	add_shortcode('addevent_links', array('\AddEvent\AddEventLinks', 'render_shortcode'));
-}
-add_action('init', '\AddEvent\register_addevent_shortcodes');
+new Add_Event();
