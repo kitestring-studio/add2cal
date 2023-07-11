@@ -98,7 +98,7 @@ class Add_Event_Shortcode_Helper {
 			'timezone' => $atts['timezone']
 		], '', '&', PHP_QUERY_RFC3986);
 
-		$services = explode(',', $atts['services']);
+		$services = isset($atts['services']) ? explode(',', $atts['services']) : ['apple', 'google', 'office365', 'outlook', 'outlookcom', 'yahoo'];
 
 		foreach ($services as $service) {
 			$service_url = $base_url . '&' . $query . '&service=' . urlencode(trim($service));
