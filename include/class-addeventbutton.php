@@ -8,10 +8,15 @@ class AddEventButton extends AddEventBase {
 		try {
 			self::validate_parameters($parameters);
 		} catch (Exception $e) {
-			return $e->getMessage(); // This will replace the shortcode with the error message.
+			return $e->getMessage();
 		}
+
+		// Enqueue the script.
+		wp_enqueue_script('addevent', 'https://cdn.addevent.com/libs/atc/1.6.1/atc.min.js', array(), null, true);
 
 		// Proceed with the button rendering...
 	}
+
+	// Other necessary methods like button rendering, etc...
 }
 
