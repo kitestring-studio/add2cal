@@ -101,6 +101,9 @@ class Add_Event_Shortcode_Helper {
 		$services = isset($atts['services']) ? explode(',', $atts['services']) : ['apple', 'google', 'office365', 'outlook', 'outlookcom', 'yahoo'];
 
 		foreach ($services as $service) {
+			if( $service === "outlookcom") {
+				$service = "outlook.com";
+			}
 			$service_url = $base_url . '&' . $query . '&service=' . urlencode(trim($service));
 			$markup .= '<a href="' . esc_url($service_url) . '">' . esc_html(ucfirst($service)) . '</a> ';
 		}
