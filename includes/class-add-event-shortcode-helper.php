@@ -62,7 +62,7 @@ class Add_Event_Shortcode_Helper {
 	 */
 	public function generate_button_markup( $data ) {
 
-		$html = '<div title="' . esc_attr( $data['title'] ) . '" class="' . esc_attr( $data['class'] ) . '">';
+		$html = '<div title="' . esc_attr( $data['title'] ) . '" class="addeventatc ' . esc_attr( $data['class'] ) . '">';
 		$html .= esc_html( $data['title'] );
 		$html .= $this->generate_date_span( 'start', $data['start'], $data['24h'] );
 		if ( ! empty( $data['end'] ) ) {
@@ -115,7 +115,7 @@ class Add_Event_Shortcode_Helper {
 			$markup      .= '<a href="' . esc_url( $service_url ) . '">' . esc_html( ucfirst( $service ) ) . '</a> ';
 		}
 
-		return $markup;
+		return "<div class='addevent__links'>$markup</div>";
 	}
 
 
