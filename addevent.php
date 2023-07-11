@@ -44,3 +44,14 @@ function addevent_admin_notice() {
 	}
 }
 add_action('admin_notices', 'addevent_admin_notice');
+
+register_activation_hook(__FILE__, function() {
+	if (!defined('ADDEVENT_API_KEY')) {
+		deactivate_plugins(plugin_basename(__FILE__));
+		wp_die(__('AddEvent requires the client ID to be defined in wp-config.php', 'addevent'));
+	}
+});
+
+register_deactivation_hook(__FILE__, function() {
+	// Clean up, e.g. delete plugin options...
+});
