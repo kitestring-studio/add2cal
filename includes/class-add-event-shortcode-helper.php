@@ -12,7 +12,7 @@ class Add_Event_Shortcode_Helper {
 	public function normalize_attributes( $attrs ) {
 		$normalized = [];
 		foreach ( $attrs as $key => $value ) {
-			$normalized[ strtolower( $key ) ] = trim( $value );
+			$normalized[ strtolower( $key ) ] = trim( sanitize_text_field( $value ) );
 		}
 
 		if ( isset( $normalized['24h'] ) && $normalized['24h'] === 'true' ) {
