@@ -40,6 +40,8 @@ class Add_Event_Shortcodes {
 		if ( count( $this->shortcode_helper->validate_attributes( $attrs ) ) ) {
 			return $this->shortcode_helper->get_invalid_message();
 		}
+
+		$attrs = $this->shortcode_helper->post_process_attributes( $attrs );
 		Add_Event::enqueue_scripts();
 
 		return $this->shortcode_helper->generate_links_markup( $attrs );

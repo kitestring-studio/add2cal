@@ -25,6 +25,20 @@ class Add_Event_Shortcode_Helper {
 			$normalized['class'] = '';
 		}
 
+
+		if ( isset( $normalized['start'] ) ) {
+			$normalized['start'] = $this->normalize_date( $normalized['start'] );
+		}
+
+		if ( isset( $normalized['end'] ) ) {
+			$normalized['end'] = $this->normalize_date( $normalized['end'] );
+		}
+
+		if ( isset( $normalized['length'])) {
+			// length is a string like '1d' or '2w'. Convert to '1 day' or '2 weeks'
+//			$normalized['length'] = $this->normalize_length( $normalized['length'] );
+		}
+
 		// @TODO $normalized['service'] must either be blank, or a combination of the following:
 		// 'apple', 'google', 'outlook', 'outlookcom', 'yahoo'
 
@@ -33,16 +47,27 @@ class Add_Event_Shortcode_Helper {
 	}
 
 	/**
+	 * Normalize date
+	 */
+	public function normalize_date( $date ) {
+		// detect the format of the date. If it's not a timestamp, convert it to a timestamp
+		if ( ! is_numeric( $date ) ) {
+			$date = strtotime( $date );
+		}
+		return $date;
+	}
+
+	/**
 	 * Validate attributes
 	 */
 	public function validate_attributes($attrs) {
 		$this->errors = [];
 		// Validate date
-		if ( isset( $attrs['start'] ) && ! strtotime( $attrs['start'] ) ) {
+		if ( isset( $attrs['start'] ) && ! $this->is_timestamp( $attrs['start'] ) ) {
 			$this->errors[] = "Invalid start date format";
 		}
 
-		if ( isset( $attrs['end'] ) && ! strtotime( $attrs['end'] ) ) {
+		if ( isset( $attrs['end'] ) && ! $this->is_timestamp( $attrs['end'] ) ) {
 			$this->errors[] = "Invalid end date format";
 		}
 
@@ -53,6 +78,43 @@ class Add_Event_Shortcode_Helper {
 		// Add more validation rules as needed
 
 		return $this->errors;
+	}
+
+	public function is_timestamp( $timestamp ) {
+		return ( is_numeric( $timestamp ) && strtotime( date( 'Y-m-d H:i:s', $timestamp ) ) === (int) $timestamp );
+	}
+
+	public function post_process_attributes( $attrs ) {
+		// If length is set, calculate end date
+		if ( isset( $attrs['length'] ) ) {
+			$attrs['end'] = $this->calculate_end_date( $attrs['start'], $attrs['length'] );
+		}
+		return $attrs;
+	}
+
+	protected function calculate_end_date( $start, $length ) {
+		// generate $end from $start and $length, where $length is a string like '1d' or '2w' and $start is timestamp
+		$end = $start;
+		$length = strtolower( $length );
+		$unit = substr( $length, -1 );
+		$amount = substr( $length, 0, -1 );
+		switch ( $unit ) {
+			case 'm':
+				$end = strtotime( '+' . $amount . ' minutes', $start );
+				break;
+			case 'h':
+				$end = strtotime( '+' . $amount . ' hours', $start );
+				break;
+			case 'd':
+				$end = strtotime( '+' . $amount . ' days', $start );
+				break;
+			case 'w':
+				$end = strtotime( '+' . $amount . ' weeks', $start );
+				break;
+		}
+
+
+		return $end;
 	}
 
 	/**
@@ -98,8 +160,8 @@ class Add_Event_Shortcode_Helper {
 		$base_url = 'https://www.addevent.com/dir/?client=' . ADDEVENT_API_KEY;
 
 		$query = http_build_query( [
-			'start'       => date( 'd-m-Y h:i A', strtotime( $atts['start'] ) ),
-			'end'         => date( 'd-m-Y h:i A', strtotime( $atts['end'] ) ),
+			'start'       => date( 'd-m-Y h:i A', $atts['start'] ),
+			'end'         => date( 'd-m-Y h:i A', $atts['end'] ), // @TODO maybe use strtotime earlier
 			'title'       => $atts['title'],
 			'description' => $atts['description'],
 			'location'    => $atts['location'],
@@ -151,6 +213,33 @@ class Add_Event_Shortcode_Helper {
 		$formatted_date = date( $format, strtotime( $date ) );
 
 		return '<span class="' . esc_attr( $field ) . '">' . esc_html( $formatted_date ) . '</span>';
+	}
+
+	/**
+	 * @param $length
+	 *
+	 * @return array|string|string[]|null
+	 */
+	protected function normalize_length( $length ) {
+		return preg_replace_callback( '/([0-9]+)([mhdw])/', function ( $matches ) {
+			$unit = $matches[2];
+			switch ( $unit ) {
+				case 'm':
+					$unit = ' minutes';
+					break;
+				case 'h':
+					$unit = ' hours';
+					break;
+				case 'd':
+					$unit = ' days';
+					break;
+				case 'w':
+					$unit = ' weeks';
+					break;
+			}
+
+			return $matches[1] . $unit;
+		}, $length );
 	}
 
 }
