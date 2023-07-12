@@ -21,6 +21,10 @@ class Add_Event_Shortcode_Helper {
 			$normalized['24h'] = false;
 		}
 
+		if ( ! isset( $normalized['class'] ) ) {
+			$normalized['class'] = '';
+		}
+
 		return $normalized;
 	}
 
