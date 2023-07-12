@@ -25,6 +25,10 @@ class Add_Event_Shortcode_Helper {
 			$normalized['class'] = '';
 		}
 
+		// @TODO $normalized['service'] must either be blank, or a combination of the following:
+		// 'apple', 'google', 'outlook', 'outlookcom', 'yahoo'
+
+
 		return $normalized;
 	}
 
@@ -94,12 +98,12 @@ class Add_Event_Shortcode_Helper {
 		$base_url = 'https://www.addevent.com/dir/?client=' . ADDEVENT_API_KEY;
 
 		$query = http_build_query( [
-			'start' => date( 'd-m-Y h:i A', strtotime( $atts['start'] ) ),
-			'end' => date( 'd-m-Y h:i A', strtotime( $atts['end'] ) ),
-			'title' => $atts['title'],
+			'start'       => date( 'd-m-Y h:i A', strtotime( $atts['start'] ) ),
+			'end'         => date( 'd-m-Y h:i A', strtotime( $atts['end'] ) ),
+			'title'       => $atts['title'],
 			'description' => $atts['description'],
-			'location' => $atts['location'],
-			'timezone' => $atts['timezone']
+			'location'    => $atts['location'],
+			'timezone'    => $atts['timezone']
 		], '', '&', PHP_QUERY_RFC3986 );
 
 		$services = isset( $atts['services'] ) ? explode( ',', $atts['services'] ) : [
@@ -116,7 +120,7 @@ class Add_Event_Shortcode_Helper {
 				$service = "outlook.com";
 			}
 			$service_url = $base_url . '&' . $query . '&service=' . urlencode( trim( $service ) );
-			$markup      .= '<a href="' . esc_url( $service_url ) . '">' . esc_html( ucfirst( $service ) ) . '</a> ';
+			$markup      .= '<a href="' . esc_url( $service_url ) . '" target="_blank">' . esc_html( ucfirst( $service ) ) . '</a> ';
 		}
 
 		return "<div class='addevent__links'>$markup</div>";
