@@ -139,8 +139,8 @@ class Add_Event_Shortcode_Helper {
 	 */
 	public function generate_button_markup( $data ) {
 
-		$html = '<div title="' . esc_attr( $data['title'] ) . '" class="addeventatc ' . esc_attr( $data['class'] ) . '">';
-		$html .= esc_html( $data['title'] );
+		$html = '<div title="' . esc_attr( $data['button_label'] ) . '" class="addeventatc ' . esc_attr( $data['class'] ) . '">';
+//		$html .= esc_html( $data['button_label'] );
 
 		foreach ( $data as $key => $value ) {
 			$html .= $this->generate_span( $key, $value );
