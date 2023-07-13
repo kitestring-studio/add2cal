@@ -16,17 +16,6 @@ class Add_Event {
 	}
 
 	/**
-	 * Include necessary files
-	 */
-	public function includes() {
-		define( 'ADDEVENT_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-
-		require_once ADDEVENT_PLUGIN_DIR . 'includes/class-add-event-shortcodes.php';
-		require_once ADDEVENT_PLUGIN_DIR . 'includes/class-add-event-shortcode-helper.php';
-		require_once ADDEVENT_PLUGIN_DIR . 'includes/class-add-event-admin-notices.php';
-	}
-
-	/**
 	 * Initialize hooks
 	 */
 	public function init_hooks() {
@@ -46,7 +35,7 @@ class Add_Event {
 	 */
 	public function register_shortcodes() {
 		$shortcodes = new Add_Event_Shortcodes();
-		add_shortcode( 'addevent_button', array( $shortcodes, 'addevent_button_shortcode' ) );
+		add_shortcode( 'addevent_button', array( $shortcodes, 'addevent_links_shortcode' ) );
 		add_shortcode( 'addevent_links', array( $shortcodes, 'addevent_links_shortcode' ) );
 	}
 }

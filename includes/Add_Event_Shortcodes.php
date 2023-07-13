@@ -12,29 +12,30 @@ class Add_Event_Shortcodes {
 		$this->shortcode_helper = new Add_Event_Shortcode_Helper();
 	}
 
-	/**
-	 * Render 'addevent_button' shortcode
-	 */
-	public function addevent_button_shortcode( $attrs ) {
-		$attrs = $this->shortcode_helper->normalize_attributes( $attrs );
-
-		if ( count( $this->shortcode_helper->validate_attributes( $attrs ) ) ) {
-			return $this->shortcode_helper->get_invalid_message();
-		}
-
-		Add_Event::enqueue_scripts();
-		$attrs = $this->shortcode_helper->post_process_attributes( $attrs );
-
-		return $this->shortcode_helper->generate_button_markup( $attrs );
-	}
 
 	/**
 	 * Render 'addevent_links' shortcode
 	 */
-	public function addevent_links_shortcode( $attrs ) {
-		if ( ! defined( 'ADDEVENT_API_KEY' ) ) {
+	public function addevent_links_shortcode( $attrs, $content, $shortcode_tag ) {
+		if ( $shortcode_tag === "addevent_links" && ! defined( 'ADDEVENT_API_KEY' ) ) {
 			return '';
 		}
+
+		$attrs = shortcode_atts( array(
+			'button_label' => 'Add to Calendar',
+			'class'        => 'addeventatc',
+			'start'        => '',
+//			'end'          => '',
+			'length'       => '1h',
+			'24h'          => '',
+			'title'        => '',
+			'timezone'     => '',
+			'event_title'  => '',
+			'description'  => '',
+			'location'     => '',
+		), $attrs );
+
+		$type = $shortcode_tag === 'addevent_button' ? 'button' : 'links';
 
 		$attrs = $this->shortcode_helper->normalize_attributes( $attrs );
 
@@ -42,9 +43,9 @@ class Add_Event_Shortcodes {
 			return $this->shortcode_helper->get_invalid_message();
 		}
 
-		$attrs = $this->shortcode_helper->post_process_attributes( $attrs );
 		Add_Event::enqueue_scripts();
+		$attrs = $this->shortcode_helper->post_process_attributes( $attrs, $shortcode_tag );
 
-		return $this->shortcode_helper->generate_links_markup( $attrs );
+		return $this->shortcode_helper->{"generate_{$type}_markup"}( $attrs );
 	}
 }
