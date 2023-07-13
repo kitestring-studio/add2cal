@@ -131,17 +131,22 @@ class Add_Event_Shortcode_Helper {
 	 * @return string Generated markup.
 	 */
 	public function generate_button_markup( $data ) {
+		$fields = [
+			'start'       => $this->format_date( $data['start'] ),
+			'end'         => $this->format_date( $data['end'] ),
+			'title'       => $data['title'],
+			'description' => $data['description'],
+			'location'    => $data['location'],
+			'timezone'    => $data['timezone']
+		];
 
 		$html = '<div title="' . esc_attr( $data['title'] ) . '" class="addeventatc ' . esc_attr( $data['class'] ) . '">';
 		$html .= esc_html( $data['title'] );
-		$html .= $this->generate_date_span( 'start', $data['start'], $data['24h'] );
-		if ( ! empty( $data['end'] ) ) {
-			$html .= $this->generate_date_span( 'end', $data['end'], $data['24h'] );
+
+		foreach ( $fields as $key => $value ) {
+			$html .= $this->generate_span( $key, $value );
 		}
-		$html .= $this->generate_span( 'timezone', $data['timezone'] );
-		$html .= $this->generate_span( 'title', $data['event_title'] );
-		$html .= $this->generate_span( 'description', $data['description'] );
-		$html .= $this->generate_span( 'location', $data['location'] );
+
 		$html .= '</div>';
 
 		return $html;
@@ -160,8 +165,8 @@ class Add_Event_Shortcode_Helper {
 		$base_url = 'https://www.addevent.com/dir/?client=' . ADDEVENT_API_KEY;
 
 		$query = http_build_query( [
-			'start'       => date( 'd-m-Y h:i A', $atts['start'] ),
-			'end'         => date( 'd-m-Y h:i A', $atts['end'] ), // @TODO maybe use strtotime earlier
+			'start'       => $this->format_date( $atts['start'] ),
+			'end'         => $this->format_date( $atts['end'] ), // @TODO maybe use strtotime earlier
 			'title'       => $atts['title'],
 			'description' => $atts['description'],
 			'location'    => $atts['location'],
@@ -210,9 +215,15 @@ class Add_Event_Shortcode_Helper {
 	 */
 	public function generate_date_span( $field, $date, $is_24h ): string {
 		$format         = $is_24h ? 'Y-m-d H:i' : 'm/d/Y h:i A';
-		$formatted_date = date( $format, strtotime( $date ) );
+		$formatted_date = date( $format, $date );
 
 		return '<span class="' . esc_attr( $field ) . '">' . esc_html( $formatted_date ) . '</span>';
+	}
+
+	public function format_date( int $date ): string {
+		$format ='Y-m-d H:i'; // ISO 8601
+
+		return date( $format, $date );
 	}
 
 	/**

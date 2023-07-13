@@ -23,6 +23,7 @@ class Add_Event_Shortcodes {
 		}
 
 		Add_Event::enqueue_scripts();
+		$attrs = $this->shortcode_helper->post_process_attributes( $attrs );
 
 		return $this->shortcode_helper->generate_button_markup( $attrs );
 	}
