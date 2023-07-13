@@ -89,6 +89,13 @@ class Add_Event_Shortcode_Helper {
 		if ( isset( $attrs['length'] ) ) {
 			$attrs['end'] = $this->calculate_end_date( $attrs['start'], $attrs['length'] );
 		}
+
+		$attrs['start'] = $this->format_date( $attrs['start'] );
+		$attrs['end']   = $this->format_date( $attrs['end'] );
+
+
+		unset( $attrs['length'] );
+
 		return $attrs;
 	}
 
@@ -131,19 +138,11 @@ class Add_Event_Shortcode_Helper {
 	 * @return string Generated markup.
 	 */
 	public function generate_button_markup( $data ) {
-		$fields = [
-			'start'       => $this->format_date( $data['start'] ),
-			'end'         => $this->format_date( $data['end'] ),
-			'title'       => $data['title'],
-			'description' => $data['description'],
-			'location'    => $data['location'],
-			'timezone'    => $data['timezone']
-		];
 
 		$html = '<div title="' . esc_attr( $data['title'] ) . '" class="addeventatc ' . esc_attr( $data['class'] ) . '">';
 		$html .= esc_html( $data['title'] );
 
-		foreach ( $fields as $key => $value ) {
+		foreach ( $data as $key => $value ) {
 			$html .= $this->generate_span( $key, $value );
 		}
 
@@ -164,14 +163,7 @@ class Add_Event_Shortcode_Helper {
 
 		$base_url = 'https://www.addevent.com/dir/?client=' . ADDEVENT_API_KEY;
 
-		$query = http_build_query( [
-			'start'       => $this->format_date( $atts['start'] ),
-			'end'         => $this->format_date( $atts['end'] ), // @TODO maybe use strtotime earlier
-			'title'       => $atts['title'],
-			'description' => $atts['description'],
-			'location'    => $atts['location'],
-			'timezone'    => $atts['timezone']
-		], '', '&', PHP_QUERY_RFC3986 );
+		$query = http_build_query( $atts, '', '&', PHP_QUERY_RFC3986 );
 
 		$services = isset( $atts['services'] ) ? explode( ',', $atts['services'] ) : [
 			'apple',
