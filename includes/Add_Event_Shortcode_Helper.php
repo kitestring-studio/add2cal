@@ -25,7 +25,6 @@ class Add_Event_Shortcode_Helper {
 			$normalized['class'] = '';
 		}
 
-
 		if ( isset( $normalized['start'] ) ) {
 			$normalized['start'] = $this->normalize_date( $normalized['start'] );
 		}
@@ -93,13 +92,25 @@ class Add_Event_Shortcode_Helper {
 		$atts['start'] = $this->format_date( $atts['start'] );
 		$atts['end']   = $this->format_date( $atts['end'] );
 
-		unset( $atts['length'] );
+		// remove length attribute if it's empty
+		if ( isset( $atts['length'] ) ) {
+			unset( $atts['length'] );
+		}
+
+		if ( isset( $atts['24h'] ) ) {
+			unset( $atts['24h'] );
+		}
+
+		// remove location attribute if it's empty
+		if ( isset( $atts['location'] ) && empty( $atts['location'] ) ) {
+			unset( $atts['location'] );
+		}
 
 		if ($shortcode_tag === 'addevent_links') {
 			unset( $atts['button_label'] );
 			unset( $atts['class']);
 		} else {
-			unset( $atts['class']);
+//			unset( $atts['class']);
 		}
 
 		return $atts;

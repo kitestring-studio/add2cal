@@ -30,7 +30,6 @@ class Add_Event_Shortcodes {
 			'24h'          => '',
 			'title'        => '',
 			'timezone'     => '',
-			'event_title'  => '',
 			'description'  => '',
 			'location'     => '',
 		), $atts );
