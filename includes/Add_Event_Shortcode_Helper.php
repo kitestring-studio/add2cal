@@ -85,8 +85,8 @@ class Add_Event_Shortcode_Helper {
 	}
 
 	public function post_process_attributes( $atts, $shortcode_tag) {
-		// If length is set, calculate end date
-		if ( isset( $atts['length'] ) ) {
+		// If length is set, calculate end date, unless end date is also set. end overrides length.
+		if ( isset( $atts['length'] ) && ! isset( $atts['end'] ) ) {
 			$atts['end'] = $this->calculate_end_date( $atts['start'], $atts['length'] );
 		}
 
