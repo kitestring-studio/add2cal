@@ -16,12 +16,12 @@ class Add_Event_Shortcodes {
 	/**
 	 * Render 'addevent_links' shortcode
 	 */
-	public function addevent_links_shortcode( $attrs, $content, $shortcode_tag ) {
+	public function addevent_links_shortcode( $atts, $content, $shortcode_tag ) {
 		if ( $shortcode_tag === "addevent_links" && ! defined( 'ADDEVENT_API_KEY' ) ) {
 			return '';
 		}
 
-		$attrs = shortcode_atts( array(
+		$atts = shortcode_atts( array(
 			'button_label' => 'Add to Calendar',
 			'class'        => 'addeventatc',
 			'start'        => '',
@@ -33,19 +33,19 @@ class Add_Event_Shortcodes {
 			'event_title'  => '',
 			'description'  => '',
 			'location'     => '',
-		), $attrs );
+		), $atts );
 
 		$type = $shortcode_tag === 'addevent_button' ? 'button' : 'links';
 
-		$attrs = $this->shortcode_helper->normalize_attributes( $attrs );
+		$atts = $this->shortcode_helper->normalize_attributes( $atts );
 
-		if ( count( $this->shortcode_helper->validate_attributes( $attrs ) ) ) {
+		if ( count( $this->shortcode_helper->validate_attributes( $atts ) ) ) {
 			return $this->shortcode_helper->get_invalid_message();
 		}
 
 		Add_Event::enqueue_scripts();
-		$attrs = $this->shortcode_helper->post_process_attributes( $attrs, $shortcode_tag );
+		$atts = $this->shortcode_helper->post_process_attributes( $atts, $shortcode_tag );
 
-		return $this->shortcode_helper->{"generate_{$type}_markup"}( $attrs );
+		return $this->shortcode_helper->{"generate_{$type}_markup"}( $atts );
 	}
 }

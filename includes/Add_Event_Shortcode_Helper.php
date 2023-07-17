@@ -9,9 +9,9 @@ class Add_Event_Shortcode_Helper {
 	/**
 	 * Normalize attributes
 	 */
-	public function normalize_attributes( $attrs ) {
+	public function normalize_attributes( $atts ) {
 		$normalized = [];
-		foreach ( $attrs as $key => $value ) {
+		foreach ( $atts as $key => $value ) {
 			$normalized[ strtolower( $key ) ] = trim( sanitize_text_field( $value ) );
 		}
 
@@ -60,18 +60,18 @@ class Add_Event_Shortcode_Helper {
 	/**
 	 * Validate attributes
 	 */
-	public function validate_attributes($attrs) {
+	public function validate_attributes( $atts ) {
 		$this->errors = [];
 		// Validate date
-		if ( isset( $attrs['start'] ) && ! $this->is_timestamp( $attrs['start'] ) ) {
+		if ( isset( $atts['start'] ) && ! $this->is_timestamp( $atts['start'] ) ) {
 			$this->errors[] = "Invalid start date format";
 		}
 
-		if ( isset( $attrs['length'] ) && ! preg_match( '/^[0-9]+[mhdw]$/', $attrs['length'] ) ) {
+		if ( isset( $atts['length'] ) && ! preg_match( '/^[0-9]+[mhdw]$/', $atts['length'] ) ) {
 			$this->errors[] = "Invalid length format";
 		}
 
-		/*if ( isset( $attrs['end'] ) && ! $this->is_timestamp( $attrs['end'] ) ) { // removed since end will be calculated from start and length
+		/*if ( isset( $atts['end'] ) && ! $this->is_timestamp( $atts['end'] ) ) { // removed since end will be calculated from start and length
 			$this->errors[] = "Invalid end date format";
 		}*/
 
@@ -84,24 +84,25 @@ class Add_Event_Shortcode_Helper {
 		return ( is_numeric( $timestamp ) && strtotime( date( 'Y-m-d H:i:s', $timestamp ) ) === (int) $timestamp );
 	}
 
-	public function post_process_attributes( $attrs, $shortcode_tag) {
+	public function post_process_attributes( $atts, $shortcode_tag) {
 		// If length is set, calculate end date
-		if ( isset( $attrs['length'] ) ) {
-			$attrs['end'] = $this->calculate_end_date( $attrs['start'], $attrs['length'] );
+		if ( isset( $atts['length'] ) ) {
+			$atts['end'] = $this->calculate_end_date( $atts['start'], $atts['length'] );
 		}
 
-		$attrs['start'] = $this->format_date( $attrs['start'] );
-		$attrs['end']   = $this->format_date( $attrs['end'] );
+		$atts['start'] = $this->format_date( $atts['start'] );
+		$atts['end']   = $this->format_date( $atts['end'] );
 
-		unset( $attrs['length'] );
+		unset( $atts['length'] );
 
 		if ($shortcode_tag === 'addevent_links') {
-			unset( $attrs['button_label'] );
+			unset( $atts['button_label'] );
+			unset( $atts['class']);
 		} else {
-			unset( $attrs['class']);
+			unset( $atts['class']);
 		}
 
-		return $attrs;
+		return $atts;
 	}
 
 	protected function calculate_end_date( $start, $length ) {
@@ -142,12 +143,15 @@ class Add_Event_Shortcode_Helper {
 	 * @param array $attributes Shortcode attributes.
 	 * @return string Generated markup.
 	 */
-	public function generate_button_markup( $data ) {
+	public function generate_button_markup( $atts ) {
 
-		$html = '<div title="' . esc_attr( $data['button_label'] ) . '" class="addeventatc ' . esc_attr( $data['class'] ) . '">';
+		$html = '<div title="' . esc_attr( $atts['button_label'] ) . '" class="addeventatc ' . esc_attr( $atts['class'] ) . '">';
 //		$html .= esc_html( $data['button_label'] );
 
-		foreach ( $data as $key => $value ) {
+		unset( $atts['class']);
+
+
+		foreach ( $atts as $key => $value ) {
 			$html .= $this->generate_span( $key, $value );
 		}
 
