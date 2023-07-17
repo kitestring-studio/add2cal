@@ -4,8 +4,8 @@
  * Plugin URI: https://github.com/user/plugin
  * Description: Provides two shortcodes, 'addevent_button' and 'addevent_links', for adding events to various calendar services.
  * Version: 1.0.0
- * Author: Your Name
- * Author URI: https://yourwebsite.com
+ * Author: Kitestring Studio
+ * Author URI: https://kitestring.studio
  * Text Domain: addevent-shortcodes
  * Domain Path: /languages
  */
