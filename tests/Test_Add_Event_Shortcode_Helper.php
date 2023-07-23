@@ -12,7 +12,7 @@ require_once '../vendor/autoload.php';
 /**
  * Test case for class Add_Event_Shortcode_Helper.
  */
-class Test_Add_Event_Shortcode_Helper extends TestCase {
+class Test_Add_Event_Shortcode_Helper extends WP_UnitTestCase {
 
 	/**
 	 * The instance of Add_Event_Shortcode_Helper that we're testing.
