@@ -33,7 +33,7 @@ class Add_Event_Shortcode_Helper {
 			$normalized['end'] = $this->normalize_date( $normalized['end'] );
 		}
 
-		if ( isset( $normalized['length'])) {
+		if ( isset( $normalized['length'] ) ) {
 			// length is a string like '1d' or '2w'. Convert to '1 day' or '2 weeks'
 //			$normalized['length'] = $this->normalize_length( $normalized['length'] );
 		}
@@ -53,6 +53,7 @@ class Add_Event_Shortcode_Helper {
 		if ( ! is_numeric( $date ) ) {
 			$date = strtotime( $date );
 		}
+
 		return $date;
 	}
 
@@ -83,7 +84,7 @@ class Add_Event_Shortcode_Helper {
 		return ( is_numeric( $timestamp ) && strtotime( date( 'Y-m-d H:i:s', $timestamp ) ) === (int) $timestamp );
 	}
 
-	public function post_process_attributes( $atts, $shortcode_tag) {
+	public function post_process_attributes( $atts, $shortcode_tag ) {
 		// If length is set, calculate end date, unless end date is also set. end overrides length.
 		if ( isset( $atts['length'] ) && ! isset( $atts['end'] ) ) {
 			$atts['end'] = $this->calculate_end_date( $atts['start'], $atts['length'] );
@@ -106,9 +107,9 @@ class Add_Event_Shortcode_Helper {
 			unset( $atts['location'] );
 		}
 
-		if ($shortcode_tag === 'addevent_links') {
+		if ( $shortcode_tag === 'addevent_links' ) {
 			unset( $atts['button_label'] );
-			unset( $atts['class']);
+			unset( $atts['class'] );
 		} else {
 //			unset( $atts['class']);
 		}
@@ -118,10 +119,10 @@ class Add_Event_Shortcode_Helper {
 
 	protected function calculate_end_date( $start, $length ) {
 		// generate $end from $start and $length, where $length is a string like '1d' or '2w' and $start is timestamp
-		$end = $start;
+		$end    = $start;
 		$length = strtolower( $length );
-		$unit = substr( $length, -1 );
-		$amount = substr( $length, 0, -1 );
+		$unit   = substr( $length, - 1 );
+		$amount = substr( $length, 0, - 1 );
 		switch ( $unit ) {
 			case 'm':
 				$end = strtotime( '+' . $amount . ' minutes', $start );
@@ -141,6 +142,12 @@ class Add_Event_Shortcode_Helper {
 		return $end;
 	}
 
+	public function format_date( int $date ): string {
+		$format = 'Y-m-d H:i'; // ISO 8601
+
+		return date( $format, $date );
+	}
+
 	/**
 	 * Generate error message for invalid attributes
 	 */
@@ -152,6 +159,7 @@ class Add_Event_Shortcode_Helper {
 	 * Generate button markup for 'addevent_button' shortcode.
 	 *
 	 * @param array $attributes Shortcode attributes.
+	 *
 	 * @return string Generated markup.
 	 */
 	public function generate_button_markup( $atts ) {
@@ -159,8 +167,7 @@ class Add_Event_Shortcode_Helper {
 		$html = '<div title="' . esc_attr( $atts['button_label'] ) . '" class="addeventatc ' . esc_attr( $atts['class'] ) . '">';
 //		$html .= esc_html( $data['button_label'] );
 
-		unset( $atts['class']);
-
+		unset( $atts['class'] );
 
 		foreach ( $atts as $key => $value ) {
 			$html .= $this->generate_span( $key, $value );
@@ -171,11 +178,23 @@ class Add_Event_Shortcode_Helper {
 		return $html;
 	}
 
+	/**
+	 * Generate span markup for a given field.
+	 *
+	 * @param string $field The field name.
+	 * @param string $value The field value.
+	 *
+	 * @return string Generated markup.
+	 */
+	public function generate_span( $field, $value ): string {
+		return '<span class="' . esc_attr( $field ) . '">' . esc_html( $value ) . '</span>';
+	}
 
 	/**
 	 * Generate a series of add-to-calendar links for various services.
 	 *
 	 * @param array $atts Shortcode attributes.
+	 *
 	 * @return string Generated markup.
 	 */
 	public function generate_links_markup( $atts ) {
@@ -205,24 +224,13 @@ class Add_Event_Shortcode_Helper {
 		return "<div class='addevent__links'>$markup</div>";
 	}
 
-
-	/**
-	 * Generate span markup for a given field.
-	 *
-	 * @param string $field The field name.
-	 * @param string $value The field value.
-	 * @return string Generated markup.
-	 */
-	public function generate_span( $field, $value ): string {
-		return '<span class="' . esc_attr( $field ) . '">' . esc_html( $value ) . '</span>';
-	}
-
 	/**
 	 * Generate span markup for a date field, using the proper formatting.
 	 *
 	 * @param string $field The field name.
 	 * @param string $date The date value.
 	 * @param bool $is_24h If true, use 24-hour format. If false, use 12-hour format.
+	 *
 	 * @return string Generated markup.
 	 */
 	public function generate_date_span( $field, $date, $is_24h ): string {
@@ -230,12 +238,6 @@ class Add_Event_Shortcode_Helper {
 		$formatted_date = date( $format, $date );
 
 		return '<span class="' . esc_attr( $field ) . '">' . esc_html( $formatted_date ) . '</span>';
-	}
-
-	public function format_date( int $date ): string {
-		$format ='Y-m-d H:i'; // ISO 8601
-
-		return date( $format, $date );
 	}
 
 	/**
